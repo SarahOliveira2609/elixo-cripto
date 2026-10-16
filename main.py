@@ -323,14 +323,14 @@ def ponto(usuarios_id):
 
 
 def listar_pontos():
-    cursor.execute('select nome, endereco from pontos_coleta')
+    cursor.execute('select id,nome, endereco from pontos_coleta')
     pontos = cursor.fetchall()
     if not pontos:
         print('Não tem pontos cadastrados!')
         return False
     else:
         for p in pontos:
-            print(f'{p[0]} - {p[1]}')
+            print(f'{p[0]} - {p[1]} - {p[2]}')
     return pontos
 
 def lista_menu(usuario_id, tipo):
