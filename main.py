@@ -1,5 +1,5 @@
 import sqlite3 #biblioteca do banco de dados
-from datetime import date
+from datetime import date #biblioteca para trabalhar com o tempo (data e hora)
 
 #conexão com o banco de dados
 conexao = sqlite3.connect('elixo.db') #abre o arquivo do banco
@@ -28,7 +28,7 @@ create table if not exists pontos_coleta(
     foreign key (usuarios_id) references usuarios(id))
 """)
 
-#tabela dos tipos de e-lixo aceitos
+#tabela materias
 cursor.execute("""
 create table if not exists materiais(
     id integer primary key autoincrement,
@@ -121,7 +121,6 @@ def decifras(texto, deslocamento, chave_xor):
     return p2
 
 #Cripto CPF
-
 def cpf_cesar(txt, deslocamento): #adaptada pra digitos (0-9,10 digitos no total), trocada pela base 48/10
     resultado = ''
     for num in txt:
@@ -160,6 +159,7 @@ def cpf_decifras(cpf, deslocamento, chave_xor):
 DESLOCAMENTO = 3  # chave do César
 CHAVE_XOR = 5  # chave do XOR
 
+#cripto cnpj
 def cnpj_cesar(txt,deslocamento):
     resultado = ''
     for num in txt:
@@ -171,6 +171,7 @@ def cnpj_cesar(txt,deslocamento):
         resultado += cnpj_cifras
     return resultado
 
+#decifra cnpj
 def cnpj_descifras(txt,deslocamento):
     resultado = ''
     for num in txt:
@@ -182,35 +183,18 @@ def cnpj_descifras(txt,deslocamento):
         resultado += descifras_cnpj
     return resultado
 
-
+#cifra em duas camadas: cesar numerico e xor me cima
 def cnpj_cifras(cnpj, deslocamento, chave_xor):
     p1 = cnpj_cesar(cnpj, deslocamento)
     p2 = xor(p1,chave_xor)
     return p2
 
+#decifra na ordem inversa: xor e cesar
 def cnpj_decifras(cnpj,deslocamento, chave_xor):
     p1 = xor(cnpj,chave_xor)
     p2 = cnpj_descifras(p1, deslocamento)
     return p2
 
-''''
-senha = input('Digite sua senha: ')
-
-senha_cifrada = cifras(senha, DESLOCAMENTO, CHAVE_XOR)
-print('Senha protegida:', senha_cifrada)
-
-senha_original = decifras(senha_cifrada, DESLOCAMENTO, CHAVE_XOR)
-print('Senha decifrada:', senha_original)
-
-
-cpf = input('Digite seu CPF (somente números): ')
-
-cpf_protegido = cpf_cifras(cpf, DESLOCAMENTO, CHAVE_XOR)
-print('CPF protegido:', cpf_protegido)
-
-cpf_original = cpf_decifras(cpf_protegido, DESLOCAMENTO, CHAVE_XOR)
-print('CPF decifrado:', cpf_original)
-'''
 
 def cadastrar():
    cpf_protegido = None
