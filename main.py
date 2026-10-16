@@ -1,4 +1,5 @@
 import sqlite3 #biblioteca do banco de dados
+from datetime import date
 
 #conexão com o banco de dados
 conexao = sqlite3.connect('elixo.db') #abre o arquivo do banco
@@ -277,7 +278,8 @@ def login():
             print('E-mail ou Senha incorretos!')
             return None
 
-def material():
+
+def material(usuario_id):
     nome_material = input('Qual o material que deseja descartar?')
     while True:
         print('Escolha uma categoria:')
@@ -290,9 +292,27 @@ def material():
         else:
             print('Categoria inválida!')
 
+    pontos = listar_pontos()
+    if not pontos:
+        print('Cadastre um ponto de coleta antes de registrar o descarte!')
+        return
+
+    while True:
+        escolha = input('Digite o ID do ponto escolhido: ')
+
+        if escolha.isdigit() and any(p[0] == int(escolha) for p in pontos):
+            ponto_id = int(escolha)
+            break
+        else:
+            print('Ponto inválido!')
+
     cursor.execute('insert into materiais (nome, categoria) values (?,?) ', (nome_material, certa,))
     conexao.commit()
     print('Material cadastrado com sucesso!')
+    material_id = cursor.lastrowid
+    cursor.execute('''INSERT INTO descartes(usuarios_id, pontos_coleta_id, materiais_id, data_descarte)VALUES (?, ?, ?, ?) ''', (usuario_id, ponto_id, material_id, date.today().isoformat()))
+    conexao.commit()
+    print('Material cadastrado e descarte registrado com sucesso!')
 
 def ponto(usuarios_id):
     nome_ponto = input('Nome do ponto de coleta:')
@@ -300,6 +320,7 @@ def ponto(usuarios_id):
     cursor.execute('insert into pontos_coleta (usuarios_id, nome, endereco) values (?,?,?)', (usuarios_id, nome_ponto, endereco))
     conexao.commit()
     print('Ponto cadastrado com sucesso!')
+
 
 def listar_pontos():
     cursor.execute('select nome, endereco from pontos_coleta')
@@ -310,17 +331,56 @@ def listar_pontos():
     else:
         for p in pontos:
             print(f'{p[0]} - {p[1]}')
+    return pontos
 
+def lista_menu(usuario_id, tipo):
+    while True:
+        if tipo == 'Empresa':
+            print('[1] Novo ponto\n'
+                  '[2] Ver pontos de coleta\n'
+                  '[0] Sair')
+            escolha = input('Escolha uma opção:')
+            if escolha == '1':
+                ponto(usuario_id)
+            elif escolha == '2':
+                listar_pontos()
+            elif escolha == '0':
+                break
+            else:
+                print('Opção Inválida!')
+        elif tipo == 'Pessoa':
+            print('[1] Novo Material\n'
+                  '[2] Ver pontos de coleta\n'
+                  '[0] Sair')
+            escolha = input('Escolha uma opção:')
+            if escolha == '1':
+                material(usuario_id)
+            elif escolha == '2':
+                listar_pontos()
+            elif escolha == '0':
+                break
+            else:
+                print('Opção Inválida!')
+        else:
+            break
 
 while True:
-    opcao = input('Escolha uma opção:[0] Sair\n[1] Cadastrar\n [2] Login')
-
-    if opcao == '1':
+    print('[1] Cadastrar\n'
+          '[2] Login\n'
+          '[3] Sair\n')
+    opc = input('Escolha um opção:')
+    if opc == '1':
         cadastrar()
-    elif opcao == '2':
-        if login():
-             print('Bem-vindo (a)!')
-    elif opcao == '0':
+    elif opc == '2':
+       user = login()
+       if user:
+           usuario_id, tipo = user
+           print('Bem-vindo(a)!')
+           lista_menu(usuario_id, tipo)
+       else:
+           print('Login incorreto!')
+    elif opc == '3':
+        print('Saindo do sistema!')
         break
     else:
         print('Opção Inválida!')
