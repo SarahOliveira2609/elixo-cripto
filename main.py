@@ -294,11 +294,22 @@ def material():
     conexao.commit()
     print('Material cadastrado com sucesso!')
 
-def ponto(usuarios_id): 
+def ponto(usuarios_id):
+    nome_ponto = input('Nome do ponto de coleta:')
+    endereco = input('Endereço: ')
+    cursor.execute('insert into pontos_coleta (usuarios_id, nome, endereco) values (?,?,?)', (usuarios_id, nome_ponto, endereco))
+    conexao.commit()
+    print('Ponto cadastrado com sucesso!')
 
-
-
-
+def listar_pontos():
+    cursor.execute('select nome, endereco from pontos_coleta')
+    pontos = cursor.fetchall()
+    if not pontos:
+        print('Não tem pontos cadastrados!')
+        return False
+    else:
+        for p in pontos:
+            print(f'{p[0]} - {p[1]}')
 
 
 while True:
