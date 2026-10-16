@@ -75,7 +75,7 @@ def cesar(texto,deslocamento):
     resultado = ''
     for letra in texto:
         numero = ord(letra) #pega o codigo ASCII da letra
-        numero -= base #recalibra pra escala 0-25
+        numero -= base #recalibra pra escala 0-94
         deslocado = (numero + deslocamento) % tamanho #aplica o deslocamento e da a volta se estourar
         deslocado += base #volta para o ASCII real
         nova_letra = chr(deslocado) #transforma n° de volta em letra
@@ -156,8 +156,8 @@ def cpf_decifras(cpf, deslocamento, chave_xor):
     p2 = cpf_descifras(p1, deslocamento)
     return p2
 
-DESLOCAMENTO = 3  # chave do César
-CHAVE_XOR = 5  # chave do XOR
+deslocamento = 3  # chave do César
+chave_xor = 5  # chave do XOR
 
 #cripto cnpj
 def cnpj_cesar(txt,deslocamento):
@@ -213,7 +213,7 @@ def cadastrar():
                 cpf = input('Digite seu CPF: ').strip()
                 if cpf.isdigit() and len(cpf) == 11:
                     print('CPF válido!')
-                    cpf_protegido = cpf_cifras(cpf, DESLOCAMENTO, CHAVE_XOR)
+                    cpf_protegido = cpf_cifras(cpf, deslocamento, chave_xor)
                     break
                 else:
                     print('CPF inválido! Digite os 11 números.')
@@ -224,7 +224,7 @@ def cadastrar():
                 cnpj = input('Digite seu CNPJ: ').strip()
                 if cnpj.isdigit() and len(cnpj) == 14:
                     print('CNPJ válido!')
-                    cnpj_protegido = cnpj_cifras(cnpj, DESLOCAMENTO, CHAVE_XOR)
+                    cnpj_protegido = cnpj_cifras(cnpj, deslocamento, chave_xor)
                     break
                 else:
                     print('CNPJ inválido! Digite os 14 números.')
@@ -233,7 +233,7 @@ def cadastrar():
             print('Opção inválida! Escolha 1 ou 2.')
 
    senha = input('Digite sua senha: ')
-   senha_cifrada = cifras(senha, DESLOCAMENTO, CHAVE_XOR)
+   senha_cifrada = cifras(senha, deslocamento, chave_xor)
    try:
         cursor.execute('insert into usuarios (nome,tipo, cpf, cnpj,email, senha ) values (?,?,?,?,?,?) ', (nome,tipo,cpf_protegido, cnpj_protegido, email, senha_cifrada,))
         conexao.commit()
@@ -254,7 +254,7 @@ def login():
         id_user = busca[0]
         tipo = busca[1]
         senha_banco = busca[2]
-        senha_original = decifras(senha_banco, DESLOCAMENTO, CHAVE_XOR)
+        senha_original = decifras(senha_banco, deslocamento, chave_xor)
         if senha == senha_original:
             print('Login feito com sucesso!')
             return id_user, tipo
